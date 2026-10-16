@@ -39,16 +39,16 @@ export function QrPreview({ payload, style }: { payload: string; style: QrStyle 
   }, [payload, style, styleKey]);
 
   return (
-    <div>
+    <div className="w-full max-w-[17.5rem]">
       {error ? (
-        <p className="max-w-xs text-center text-sm text-red-700 dark:text-red-400">{error}</p>
+        <p className="text-center text-sm text-red-700 dark:text-red-400">{error}</p>
       ) : null}
       <div
         ref={ref}
         data-testid="qr-preview"
         role="img"
         aria-label={`QR code, error correction ${effectiveErrorCorrection(style)}`}
-        className={error ? "hidden" : "[&_svg]:h-auto [&_svg]:max-w-full"}
+        className={error ? "hidden" : "[&_svg]:block [&_svg]:h-auto [&_svg]:w-full"}
       />
     </div>
   );

@@ -56,7 +56,7 @@ function TypeButton({
       onClick={() => onSelect(type)}
       className={cx(
         "flex items-center gap-2 rounded-lg text-left text-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
-        compact ? "shrink-0 px-2.5 py-2" : "w-full px-2 py-1.5",
+        compact ? "min-h-11 shrink-0 snap-start px-2.5 py-2" : "min-h-11 w-full px-2 py-1.5",
         active
           ? "bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-200"
           : "text-slate-600 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
@@ -80,20 +80,24 @@ function TypeButton({
 export function TypeSelector({
   selected,
   onSelect,
+  mode = "all",
 }: {
   selected: QrType;
   onSelect: (type: QrType) => void;
+  mode?: "all" | "scroll" | "rail";
 }) {
   const types = TYPE_GROUPS.flatMap((group) => group.types);
+  const showScroll = mode !== "rail";
+  const showRail = mode !== "scroll";
 
   return (
-    <nav aria-label="QR code type" className="rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-zinc-800 dark:bg-zinc-900 lg:p-3">
-      <div className="flex gap-1 overflow-x-auto lg:hidden">
+    <nav aria-label="QR code type" className="min-w-0 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:p-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={cx("type-scroll -mx-1 flex snap-x gap-1 overflow-x-auto overscroll-x-contain px-1 md:flex-wrap md:overflow-visible", showRail && "lg:hidden", !showScroll && "hidden")}>
         {types.map((type) => (
           <TypeButton key={type} type={type} active={type === selected} onSelect={onSelect} compact />
         ))}
       </div>
-      <div className="hidden space-y-4 lg:block">
+      <div className={cx("space-y-4", showScroll ? "hidden lg:block" : showRail ? "block" : "hidden")}>
         {TYPE_GROUPS.map((group) => (
           <div key={group.id}>
             <h2 className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">

@@ -72,6 +72,7 @@ type ShareData = { files: File[]; title: string };
 export type ShareEnv = {
   share?: (data: ShareData) => Promise<void>;
   canShare?: (data: ShareData) => boolean;
+  copyText?: (text: string) => Promise<void>;
   copyImage?: (file: File) => Promise<void>;
 };
 
@@ -86,11 +87,11 @@ function defaultShareEnv(): ShareEnv {
   return {
     share: typeof navigator.share === "function" ? (data) => navigator.share(data) : undefined,
     canShare: typeof navigator.canShare === "function" ? (data) => navigator.canShare(data) : undefined,
-    copyImage: async (file) => {
-      if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+    copyText: async (text) => {
+      if (!navigator.clipboard?.writeText) {
         throw new Error("clipboard-unavailable");
       }
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": file })]);
+      await navigator.clipboard.writeText(text);
     },
   };
 }
@@ -99,6 +100,7 @@ export async function presentSharedFile(
   files: File[],
   title: string,
   env: ShareEnv = defaultShareEnv(),
+  text = "",
 ): Promise<{ method: "shared" | "copied"; file: File }> {
   if (env.share) {
     for (const file of files) {
@@ -126,7 +128,17 @@ export async function presentSharedFile(
     }
   }
 
+  const note = text.trim();
   const png = files.find((file) => file.type === "image/png");
+  const copiedFile = png ?? files[0];
+  if (note && copiedFile && env.copyText) {
+    try {
+      await env.copyText(note);
+      return { method: "copied", file: copiedFile };
+    } catch {
+      // Text copy is the pasteable fallback. Try the image only if this fails.
+    }
+  }
   if (png && env.copyImage) {
     try {
       await env.copyImage(png);
@@ -178,7 +190,7 @@ export async function shareQr(options: {
     const png = await renderBlob(payload, style, "png", Math.min(style.exportSize, SHARE_MAX_SIZE));
     files.push(new File([png], pngName, { type: "image/png" }));
   }
-  return presentSharedFile(files, caption.trim() || "QR code");
+  return presentSharedFile(files, caption.trim() || "QR code", undefined, payload);
 }
 
 export async function mountPreview(container: HTMLElement, payload: string, style: QrStyle): Promise<void> {

@@ -41,6 +41,29 @@ describe("presentSharedFile", () => {
     ).rejects.toBeInstanceOf(ShareCancelled);
   });
 
+  it("copies the link as text when no share menu is available", async () => {
+    let text = "";
+    let imageCopied = false;
+    const result = await presentSharedFile(
+      [png("code.png")],
+      "Cafe",
+      {
+        canShare: () => false,
+        copyText: async (value) => {
+          text = value;
+        },
+        copyImage: async () => {
+          imageCopied = true;
+        },
+      },
+      "https://example.com/menu",
+    );
+
+    expect(result.method).toBe("copied");
+    expect(text).toBe("https://example.com/menu");
+    expect(imageCopied).toBe(false);
+  });
+
   it("copies the image when no share menu is available", async () => {
     let copied = "";
     const result = await presentSharedFile([pdf(), png("code.png")], "Cafe", {

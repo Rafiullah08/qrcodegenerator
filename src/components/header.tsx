@@ -26,7 +26,7 @@ export function Header() {
           </span>
           <span className="min-w-0">
             <span className="block text-[15px] font-semibold tracking-tight text-slate-900 dark:text-zinc-50">QR Studio</span>
-            <span className="block truncate text-xs text-slate-500 dark:text-zinc-400">Static codes, on this device</span>
+            <span className="hidden truncate text-xs text-slate-500 sm:block dark:text-zinc-400">Static codes, on this device</span>
           </span>
         </Link>
         <div className="flex items-center gap-1">

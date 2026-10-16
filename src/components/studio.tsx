@@ -142,9 +142,11 @@ function StudioApp() {
     setCopied(false);
   }
 
-  function shareStatus(result: { method: "shared" | "copied"; file: File }, requested: ExportFormat): string {
+  function shareStatus(result: { method: "shared" | "copied"; file: File }, requested: ExportFormat, payload: string): string {
     if (result.method === "copied") {
-      return "Image copied. Paste it into a chat or email. Nothing was downloaded.";
+      return /^https?:\/\//i.test(payload.trim())
+        ? "Link copied. Paste it into WhatsApp, email, or any chat."
+        : "Content copied. Paste it into a chat or email.";
     }
     if (requested !== "png" && result.file.type === "image/png") {
       return "Shared as a PNG image, which this device can send. Nothing was downloaded.";
@@ -168,7 +170,7 @@ function StudioApp() {
         filename: buildFilename(source.type, source.name, format),
         caption: source.name,
       });
-      const message = shareStatus(outcome, format);
+      const message = shareStatus(outcome, format, source.payload);
       if (surface === "banner") {
         setBanner(message);
       } else {
@@ -360,11 +362,14 @@ function StudioApp() {
           {banner}
         </p>
       ) : null}
-      <div className="grid items-start gap-4 lg:grid-cols-[13.75rem_minmax(0,1fr)_23rem]">
-        <div className="lg:sticky lg:top-[4.25rem]">
-          <TypeSelector selected={type} onSelect={selectType} />
+      <div className="sticky top-16 z-20 mb-4 min-w-0 lg:hidden">
+        <TypeSelector selected={type} onSelect={selectType} mode="scroll" />
+      </div>
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[13.75rem_minmax(0,1fr)_23rem]">
+        <div className="hidden min-w-0 lg:sticky lg:top-[4.25rem] lg:block">
+          <TypeSelector selected={type} onSelect={selectType} mode="rail" />
         </div>
-        <section className={`${cardClass} p-5 sm:p-6`}>
+        <section className={`${cardClass} min-w-0 p-4 sm:p-6`}>
           <QrForm
             type={type}
             forms={forms}
@@ -375,7 +380,7 @@ function StudioApp() {
             onSubmit={() => setAttempted(true)}
           />
         </section>
-        <div className="lg:sticky lg:top-[4.25rem] lg:max-h-[calc(100vh-5.25rem)] lg:overflow-y-auto">
+        <div className="min-w-0 lg:sticky lg:top-[4.25rem] lg:max-h-[calc(100vh-5.25rem)] lg:overflow-y-auto">
           <PreviewPanel
             type={type}
             status={payload ? "ready" : result.status === "ready" ? "invalid" : result.status}

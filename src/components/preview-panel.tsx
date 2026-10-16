@@ -102,7 +102,7 @@ export function PreviewPanel({
           </span>
         </div>
         <div
-          className="mx-auto flex min-h-[280px] w-fit min-w-[240px] items-center justify-center rounded-2xl border border-white bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)] dark:border-zinc-700 dark:bg-zinc-950"
+          className="mx-auto flex w-full max-w-[20rem] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:p-4 dark:border-zinc-700 dark:bg-zinc-950"
           style={status === "ready" ? { backgroundColor: background } : undefined}
           data-qr-status={status}
         >
@@ -214,20 +214,20 @@ export function PreviewPanel({
       <div className="grid grid-cols-3 gap-2">
         <button
           type="button"
-          className={secondaryButtonClass}
+          className={`${secondaryButtonClass} px-1! text-xs sm:px-3! sm:text-sm`}
           onClick={onShare}
           disabled={!canExport || busy}
           data-testid="share-button"
         >
-          <Share2 className="size-4" aria-hidden="true" />
+          <Share2 className="size-4 shrink-0" aria-hidden="true" />
           Share
         </button>
-        <button type="button" className={secondaryButtonClass} onClick={onPrint} disabled={!canExport || busy}>
-          <Printer className="size-4" aria-hidden="true" />
+        <button type="button" className={`${secondaryButtonClass} px-1! text-xs sm:px-3! sm:text-sm`} onClick={onPrint} disabled={!canExport || busy}>
+          <Printer className="size-4 shrink-0" aria-hidden="true" />
           Print
         </button>
-        <button type="button" className={secondaryButtonClass} onClick={onSave} disabled={!canExport || (sensitive && !sensitiveConfirmed)}>
-          <Save className="size-4" aria-hidden="true" />
+        <button type="button" className={`${secondaryButtonClass} px-1! text-xs sm:px-3! sm:text-sm`} onClick={onSave} disabled={!canExport || (sensitive && !sensitiveConfirmed)}>
+          <Save className="size-4 shrink-0" aria-hidden="true" />
           Save
         </button>
       </div>
@@ -247,7 +247,7 @@ export function PreviewPanel({
         </label>
       ) : null}
       <p className="text-xs leading-5 text-slate-500">
-        Share sends the image from this device without a download. If the share menu is unavailable, the image is copied so you can paste it.
+        Share opens the menu on this device. If that menu is unavailable, the link or content is copied so you can paste it into a chat.
       </p>
 
       {payload ? (
@@ -310,7 +310,7 @@ function Customize({
 
   return (
     <div className="border-t border-slate-100 dark:border-zinc-800">
-      <div className="flex items-center justify-between gap-2 px-4 pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 pt-3 sm:px-4">
         <div className="flex gap-1" role="tablist" aria-label="Design">
           {tabs.map((item) => (
             <button
@@ -469,7 +469,7 @@ function ColorField({
   return (
     <label className="block space-y-1.5">
       <span className={labelClass}>{label}</span>
-      <span className="flex gap-2">
+      <span className="flex min-w-0 gap-2">
         <input
           type="color"
           aria-label={`${label} picker`}
