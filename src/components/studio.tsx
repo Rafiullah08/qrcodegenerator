@@ -349,59 +349,33 @@ function StudioApp() {
       : "Fix the highlighted fields to update the code.";
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-teal-800 dark:text-teal-300">
-            Personal QR studio
-          </p>
-          <h1 className="mt-2 font-display text-4xl leading-none text-stone-900 sm:text-5xl dark:text-stone-50">
-            Codes that keep the data inside.
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-stone-600 dark:text-zinc-400">
-            Make a static QR code for a link, contact, Wi-Fi network, or payment. It is drawn in this browser, with no account and no redirect.
-          </p>
-        </div>
-        <ul className="flex flex-wrap gap-2">
-          {["No expiry on the image", "Nothing is uploaded", "Ready to print"].map((item) => (
-            <li
-              key={item}
-              className="rounded-full border border-stone-200/90 bg-white/80 px-3 py-1.5 text-xs font-medium text-stone-700 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="mx-auto w-full max-w-[90rem] px-3 py-4 sm:px-5 lg:px-6">
+      <h1 className="sr-only">QR Studio</h1>
       <p className="sr-only" aria-live="polite">
         {banner ?? (copied ? "Encoded content copied." : "")}
         {payload ? ` ${utf8ByteLength(payload)} bytes ready.` : ""}
       </p>
       {banner ? (
-        <p className="mb-4 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" role="status">
+        <p className="mb-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" role="status">
           {banner}
         </p>
       ) : null}
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-        <section className={`${cardClass} p-5 sm:p-7`}>
-          <div className="mb-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-400">01 — Content</p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-stone-900 dark:text-zinc-50">What should the code open?</h2>
-          </div>
+      <div className="grid items-start gap-4 lg:grid-cols-[13.75rem_minmax(0,1fr)_23rem]">
+        <div className="lg:sticky lg:top-[4.25rem]">
           <TypeSelector selected={type} onSelect={selectType} />
-          <div className="mt-6 border-t border-stone-100 pt-6 dark:border-zinc-800">
-            <QrForm
-              type={type}
-              forms={forms}
-              errors={fieldErrors}
-              headingRef={headingRef}
-              onChange={onFieldChange}
-              onBlur={(field) => setTouched((current) => ({ ...current, [field]: true }))}
-              onSubmit={() => setAttempted(true)}
-            />
-          </div>
+        </div>
+        <section className={`${cardClass} p-5 sm:p-6`}>
+          <QrForm
+            type={type}
+            forms={forms}
+            errors={fieldErrors}
+            headingRef={headingRef}
+            onChange={onFieldChange}
+            onBlur={(field) => setTouched((current) => ({ ...current, [field]: true }))}
+            onSubmit={() => setAttempted(true)}
+          />
         </section>
-        <div className="lg:sticky lg:top-20">
+        <div className="lg:sticky lg:top-[4.25rem] lg:max-h-[calc(100vh-5.25rem)] lg:overflow-y-auto">
           <PreviewPanel
             type={type}
             status={payload ? "ready" : result.status === "ready" ? "invalid" : result.status}
@@ -456,7 +430,7 @@ function StudioApp() {
           onClear={clearHistory}
         />
       </div>
-      <p className="mt-8 text-center text-xs leading-5 text-stone-500">
+      <p className="mt-6 text-center text-xs leading-5 text-slate-500">
         Nothing you type is sent to a server. A downloaded image keeps working even if this history is cleared.
       </p>
     </div>

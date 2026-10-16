@@ -26,7 +26,7 @@ import {
   type QrType,
 } from "@/lib/types";
 import { Copy, Download, ImagePlus, Printer, QrCode, RotateCcw, Save, Share2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 export function PreviewPanel({
   type,
@@ -87,50 +87,42 @@ export function PreviewPanel({
 
   return (
     <section id="qr-preview" className={`${cardClass} overflow-hidden`} aria-label="QR preview">
-      <div className="border-b border-stone-100 px-5 py-4 sm:px-6 dark:border-zinc-800">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-400">02 — Preview</p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight text-stone-900 dark:text-zinc-50">Live proof</h2>
-          </div>
+      <div className="qr-stage relative px-4 py-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-zinc-100">Preview</h2>
           <span
             className={cx(
-              "rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide",
+              "rounded-full px-2 py-0.5 text-[11px] font-semibold",
               status === "ready"
-                ? "bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-200"
-                : "bg-stone-100 text-stone-500 dark:bg-zinc-800 dark:text-zinc-300",
+                ? "bg-white text-indigo-700 shadow-sm dark:bg-zinc-900 dark:text-indigo-200"
+                : "bg-white/80 text-slate-500 dark:bg-zinc-900 dark:text-zinc-300",
             )}
           >
-            {status === "ready" ? "Static" : status === "invalid" ? "Check fields" : "Waiting"}
+            {status === "ready" ? "Ready" : status === "invalid" ? "Check fields" : "Waiting"}
           </span>
+        </div>
+        <div
+          className="mx-auto flex min-h-[280px] w-fit min-w-[240px] items-center justify-center rounded-2xl border border-white bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.08)] dark:border-zinc-700 dark:bg-zinc-950"
+          style={status === "ready" ? { backgroundColor: background } : undefined}
+          data-qr-status={status}
+        >
+          {status === "ready" && payload ? (
+            <QrPreview payload={payload} style={style} />
+          ) : (
+            <div className="max-w-[14rem] px-2 py-8 text-center">
+              <span className="mx-auto grid size-11 place-items-center rounded-xl bg-slate-100 text-slate-400 dark:bg-zinc-800 dark:text-zinc-400">
+                <QrCode className="size-5" aria-hidden="true" />
+              </span>
+              <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-zinc-400">
+                {formError ?? emptyMessage}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="px-5 py-5 sm:px-6">
-      <div className="rounded-[1.4rem] bg-stone-900 p-2.5 shadow-[0_20px_40px_rgba(28,25,23,0.18)] dark:bg-black">
-      <div
-        className={cx(
-          "flex min-h-[300px] items-center justify-center rounded-[1.1rem] p-6",
-          status === "ready" ? "" : "bg-[radial-gradient(circle_at_center,#ffffff,#eceae4)] dark:bg-zinc-950",
-        )}
-        style={status === "ready" ? { backgroundColor: background } : undefined}
-        data-qr-status={status}
-      >
-        {status === "ready" && payload ? (
-          <QrPreview payload={payload} style={style} />
-        ) : (
-          <div className="max-w-xs text-center">
-            <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-white text-stone-500 shadow-sm dark:bg-zinc-900 dark:text-zinc-300">
-              <QrCode className="size-5" aria-hidden="true" />
-            </span>
-            <p className="mt-3 text-sm leading-6 text-stone-500 dark:text-zinc-400">
-              {formError ?? emptyMessage}
-            </p>
-          </div>
-        )}
-      </div>
-      </div>
-      <p className="mt-3 text-xs leading-5 text-stone-500 dark:text-zinc-400">
+      <div className="space-y-3 border-t border-slate-100 px-4 py-4 dark:border-zinc-800">
+      <p className="text-xs leading-5 text-slate-500 dark:text-zinc-400">
         The image stores this data directly. It does not expire. A website or payment page inside it can still go offline later.
       </p>
 
@@ -165,28 +157,25 @@ export function PreviewPanel({
         </ul>
       ) : null}
 
-      {payload ? (
-        <div className="mt-4">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-medium">Encoded content</h3>
-            <button type="button" className="inline-flex items-center gap-1 text-sm font-medium text-teal-800 dark:text-teal-300" onClick={onCopy}>
-              <Copy className="size-3.5" aria-hidden="true" />
-              Copy
-            </button>
-          </div>
-          <pre
-            data-testid="encoded-payload"
-            className="mt-2 max-h-36 overflow-auto whitespace-pre-wrap break-all rounded-2xl bg-stone-950 px-3 py-2.5 font-mono text-xs leading-5 text-stone-100"
+      <div className="grid grid-cols-3 rounded-lg bg-slate-100 p-1 dark:bg-zinc-950" role="group" aria-label="Format">
+        {(["png", "svg", "pdf"] as const).map((item) => (
+          <button
+            key={item}
+            type="button"
+            aria-pressed={format === item}
+            onClick={() => onFormat(item)}
+            className={cx(
+              "rounded-md py-1.5 text-xs font-semibold uppercase tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+              format === item
+                ? "bg-white text-slate-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
+                : "text-slate-500 hover:text-slate-800 dark:text-zinc-400",
+            )}
           >
-            {payload}
-          </pre>
-          <p className="mt-1 text-xs text-zinc-500">{bytes} bytes stored in the image</p>
-        </div>
-      ) : null}
-
-      <Customize style={style} onStyle={onStyle} onLogo={onLogo} onResetStyle={onResetStyle} logoError={logoError} />
-
-      <div className="mt-6 space-y-3 border-t border-stone-100 pt-5 dark:border-zinc-800">
+            {item}
+          </button>
+        ))}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
         <TextLabel label="File name">
           <input
             className={inputClass}
@@ -196,75 +185,95 @@ export function PreviewPanel({
             aria-describedby="filename-hint"
           />
         </TextLabel>
-        <p id="filename-hint" className="text-xs text-zinc-500">
-          Used for the download, the shared file, and saved history. Passwords and account numbers are not added unless you type them here.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <label className="block space-y-1.5">
-            <span className={labelClass}>Format</span>
-            <select
-              className={inputClass}
-              value={format}
-              onChange={(event) => onFormat(event.target.value as ExportFormat)}
+        <SelectControl
+          id="export-size"
+          label="Resolution"
+          value={String(style.exportSize)}
+          onChange={(value) => onStyle({ exportSize: Number(value) as QrStyle["exportSize"] })}
+        >
+          {EXPORT_SIZES.map((size) => (
+            <option key={size} value={size}>
+              {size}px{size === 2048 ? " · print" : ""}
+            </option>
+          ))}
+        </SelectControl>
+      </div>
+      <p id="filename-hint" className="text-xs leading-5 text-slate-500">
+        The name is used for the file and saved history. Passwords are not added unless you type them here.
+      </p>
+      <button
+        type="button"
+        className={`${primaryButtonClass} w-full py-3`}
+        onClick={onDownload}
+        disabled={!canExport || busy}
+        data-testid="download-button"
+      >
+        <Download className="size-4" aria-hidden="true" />
+        {busy ? "Preparing…" : `Download ${format.toUpperCase()}`}
+      </button>
+      <div className="grid grid-cols-3 gap-2">
+        <button
+          type="button"
+          className={secondaryButtonClass}
+          onClick={onShare}
+          disabled={!canExport || busy}
+          data-testid="share-button"
+        >
+          <Share2 className="size-4" aria-hidden="true" />
+          Share
+        </button>
+        <button type="button" className={secondaryButtonClass} onClick={onPrint} disabled={!canExport || busy}>
+          <Printer className="size-4" aria-hidden="true" />
+          Print
+        </button>
+        <button type="button" className={secondaryButtonClass} onClick={onSave} disabled={!canExport || (sensitive && !sensitiveConfirmed)}>
+          <Save className="size-4" aria-hidden="true" />
+          Save
+        </button>
+      </div>
+      {sensitive ? (
+        <label className="flex items-start gap-3 text-sm text-slate-700 dark:text-zinc-300">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 rounded border-slate-300"
+            checked={sensitiveConfirmed}
+            onChange={(event) => onSensitiveConfirmed(event.target.checked)}
+          />
+          <span>
+            {type === "wifi"
+              ? "Saving stores the Wi-Fi password in this browser. It is not uploaded."
+              : "Saving stores these payment details in this browser. It is not uploaded."}
+          </span>
+        </label>
+      ) : null}
+      <p className="text-xs leading-5 text-slate-500">
+        Share sends the image from this device without a download. If the share menu is unavailable, the image is copied so you can paste it.
+      </p>
+
+      {payload ? (
+        <details className="rounded-lg border border-slate-200 dark:border-zinc-700">
+          <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-slate-700 dark:text-zinc-200">
+            Encoded content · {bytes} bytes
+          </summary>
+          <div className="border-t border-slate-200 px-3 py-2 dark:border-zinc-700">
+            <div className="mb-2 flex justify-end">
+              <button type="button" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-300" onClick={onCopy}>
+                <Copy className="size-3.5" aria-hidden="true" />
+                Copy
+              </button>
+            </div>
+            <pre
+              data-testid="encoded-payload"
+              className="max-h-36 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-slate-950 px-3 py-2 font-mono text-xs leading-5 text-slate-100"
             >
-              <option value="png">PNG</option>
-              <option value="svg">SVG</option>
-              <option value="pdf">PDF</option>
-            </select>
-          </label>
-          <div className="flex items-end">
-            <button
-              type="button"
-              className={`${primaryButtonClass} w-full sm:w-auto`}
-              onClick={onDownload}
-              disabled={!canExport || busy}
-              data-testid="download-button"
-            >
-              <Download className="size-4" aria-hidden="true" />
-              {busy ? "Preparing…" : "Download"}
-            </button>
+              {payload}
+            </pre>
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className={secondaryButtonClass}
-            onClick={onShare}
-            disabled={!canExport || busy}
-            data-testid="share-button"
-          >
-            <Share2 className="size-4" aria-hidden="true" />
-            Share
-          </button>
-          <button type="button" className={secondaryButtonClass} onClick={onPrint} disabled={!canExport || busy}>
-            <Printer className="size-4" aria-hidden="true" />
-            Print
-          </button>
-          <button type="button" className={secondaryButtonClass} onClick={onSave} disabled={!canExport || (sensitive && !sensitiveConfirmed)}>
-            <Save className="size-4" aria-hidden="true" />
-            Save in this browser
-          </button>
-        </div>
-        {sensitive ? (
-          <label className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
-            <input
-              type="checkbox"
-              className="mt-0.5 size-4 rounded border-zinc-300"
-              checked={sensitiveConfirmed}
-              onChange={(event) => onSensitiveConfirmed(event.target.checked)}
-            />
-            <span>
-              {type === "wifi"
-                ? "Saving stores the Wi-Fi password in this browser. It is not uploaded."
-                : "Saving stores these payment details in this browser. It is not uploaded."}
-            </span>
-          </label>
-        ) : null}
-        <p className="text-xs leading-5 text-zinc-500">
-          Share opens the menu on this device, so you can send the image without downloading it. If that menu is unavailable, the image is copied for pasting into a chat.
-        </p>
+        </details>
+      ) : null}
       </div>
-      </div>
+
+      <Customize style={style} onStyle={onStyle} onLogo={onLogo} onResetStyle={onResetStyle} logoError={logoError} />
     </section>
   );
 }
@@ -291,143 +300,155 @@ function Customize({
   onResetStyle: () => void;
   logoError: string | null;
 }) {
+  const [tab, setTab] = useState<"colors" | "shapes" | "logo">("colors");
   const logoLocked = Boolean(style.logoDataUrl);
+  const tabs = [
+    { id: "colors", label: "Colors" },
+    { id: "shapes", label: "Shapes" },
+    { id: "logo", label: "Logo" },
+  ] as const;
+
   return (
-    <div className="mt-6 space-y-4 rounded-2xl border border-stone-100 bg-stone-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-950/50">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold">Appearance</h3>
-        <button type="button" className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" onClick={onResetStyle}>
+    <div className="border-t border-slate-100 dark:border-zinc-800">
+      <div className="flex items-center justify-between gap-2 px-4 pt-3">
+        <div className="flex gap-1" role="tablist" aria-label="Design">
+          {tabs.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === item.id}
+              onClick={() => setTab(item.id)}
+              className={cx(
+                "rounded-md px-2.5 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+                tab === item.id
+                  ? "bg-slate-100 text-slate-900 dark:bg-zinc-800 dark:text-zinc-50"
+                  : "text-slate-500 hover:text-slate-800 dark:text-zinc-400",
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <button type="button" className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white" onClick={onResetStyle}>
           <RotateCcw className="size-3.5" aria-hidden="true" />
-          Reset appearance
+          Reset
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2" aria-label="Color presets">
-        {COLOR_PRESETS.map((preset) => (
-          <button
-            key={preset.name}
-            type="button"
-            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 shadow-sm hover:border-stone-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-            onClick={() => onStyle({ foreground: preset.foreground, background: preset.background })}
-          >
-            <span
-              className="size-3.5 rounded-full border border-black/10"
-              style={{ background: `linear-gradient(135deg, ${preset.foreground} 50%, ${preset.background} 50%)` }}
-              aria-hidden="true"
-            />
-            {preset.name}
-          </button>
-        ))}
-      </div>
+      <div className="space-y-4 px-4 py-4">
+        {tab === "colors" ? (
+          <>
+            <div className="flex flex-wrap gap-2" aria-label="Color presets">
+              {COLOR_PRESETS.map((preset) => (
+                <button
+                  key={preset.name}
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                  onClick={() => onStyle({ foreground: preset.foreground, background: preset.background })}
+                >
+                  <span
+                    className="size-3.5 rounded-full border border-black/10"
+                    style={{ background: `linear-gradient(135deg, ${preset.foreground} 50%, ${preset.background} 50%)` }}
+                    aria-hidden="true"
+                  />
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ColorField id="foreground" label="Foreground" value={style.foreground} onChange={(value) => onStyle({ foreground: value })} />
+              <ColorField id="background" label="Background" value={style.background} onChange={(value) => onStyle({ background: value })} />
+            </div>
+          </>
+        ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ColorField
-          id="foreground"
-          label="Foreground"
-          value={style.foreground}
-          onChange={(value) => onStyle({ foreground: value })}
-        />
-        <ColorField
-          id="background"
-          label="Background"
-          value={style.background}
-          onChange={(value) => onStyle({ background: value })}
-        />
-      </div>
+        {tab === "shapes" ? (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SelectControl id="dots" label="Dot style" value={style.dots} onChange={(value) => onStyle({ dots: value as QrStyle["dots"] })}>
+                {DOT_STYLES.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+              <SelectControl id="corners" label="Corner style" value={style.corners} onChange={(value) => onStyle({ corners: value as QrStyle["corners"] })}>
+                {CORNER_STYLES.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+              <SelectControl id="corner-dots" label="Corner center" value={style.cornerDots} onChange={(value) => onStyle({ cornerDots: value as QrStyle["cornerDots"] })}>
+                {CORNER_DOT_STYLES.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+              <SelectControl
+                id="ec"
+                label="Error correction"
+                value={logoLocked ? "H" : style.errorCorrection}
+                disabled={logoLocked}
+                onChange={(value) => onStyle({ errorCorrection: value as QrStyle["errorCorrection"] })}
+              >
+                {ERROR_CORRECTION_OPTIONS.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+            </div>
+            <label className="block space-y-1.5">
+              <span className="flex items-baseline justify-between">
+                <span className={labelClass}>Quiet zone</span>
+                <span className="text-xs text-slate-500">{style.margin}px on screen</span>
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={48}
+                step={1}
+                value={style.margin}
+                aria-valuemin={0}
+                aria-valuemax={48}
+                aria-valuenow={style.margin}
+                aria-describedby="margin-hint"
+                onChange={(event) => onStyle({ margin: Number(event.target.value) })}
+                className="w-full accent-indigo-600"
+              />
+              <span id="margin-hint" className="block text-xs leading-5 text-slate-500">
+                Empty space around the code. Keep some so scanners can find the edges. It scales with the export size.
+              </span>
+            </label>
+          </>
+        ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <SelectControl id="dots" label="Dot style" value={style.dots} onChange={(value) => onStyle({ dots: value as QrStyle["dots"] })}>
-          {DOT_STYLES.map((item) => (
-            <option key={item.value} value={item.value}>{item.label}</option>
-          ))}
-        </SelectControl>
-        <SelectControl id="corners" label="Corner style" value={style.corners} onChange={(value) => onStyle({ corners: value as QrStyle["corners"] })}>
-          {CORNER_STYLES.map((item) => (
-            <option key={item.value} value={item.value}>{item.label}</option>
-          ))}
-        </SelectControl>
-        <SelectControl id="corner-dots" label="Corner center" value={style.cornerDots} onChange={(value) => onStyle({ cornerDots: value as QrStyle["cornerDots"] })}>
-          {CORNER_DOT_STYLES.map((item) => (
-            <option key={item.value} value={item.value}>{item.label}</option>
-          ))}
-        </SelectControl>
-        <SelectControl
-          id="ec"
-          label="Error correction"
-          value={logoLocked ? "H" : style.errorCorrection}
-          disabled={logoLocked}
-          onChange={(value) => onStyle({ errorCorrection: value as QrStyle["errorCorrection"] })}
-        >
-          {ERROR_CORRECTION_OPTIONS.map((item) => (
-            <option key={item.value} value={item.value}>{item.label}</option>
-          ))}
-        </SelectControl>
-      </div>
-
-      <label className="block space-y-1.5">
-        <span className="flex items-baseline justify-between">
-          <span className={labelClass}>Quiet zone</span>
-          <span className="text-xs text-zinc-500">{style.margin}px on screen</span>
-        </span>
-        <input
-          type="range"
-          min={0}
-          max={48}
-          step={1}
-          value={style.margin}
-          aria-valuemin={0}
-          aria-valuemax={48}
-          aria-valuenow={style.margin}
-          aria-describedby="margin-hint"
-          onChange={(event) => onStyle({ margin: Number(event.target.value) })}
-          className="w-full accent-teal-800"
-        />
-        <span id="margin-hint" className="block text-xs leading-5 text-zinc-500">
-          Empty space around the code. Keep some so scanners can find the edges. It scales with the export size.
-        </span>
-      </label>
-
-      <SelectControl
-        id="export-size"
-        label="Export resolution"
-        value={String(style.exportSize)}
-        onChange={(value) => onStyle({ exportSize: Number(value) as QrStyle["exportSize"] })}
-      >
-        {EXPORT_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {size} × {size}px{size === 2048 ? " · recommended for print" : ""}
-          </option>
-        ))}
-      </SelectControl>
-
-      <div className="space-y-2">
-        <span className={labelClass}>Center logo</span>
-        <div className="flex flex-wrap items-center gap-2">
-          <label className={`${secondaryButtonClass} cursor-pointer`}>
-            <ImagePlus className="size-4" aria-hidden="true" />
-            Choose image
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
-              className="sr-only"
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                onLogo(file);
-                event.target.value = "";
-              }}
-            />
-          </label>
-          {style.logoDataUrl ? (
-            <button type="button" className={secondaryButtonClass} onClick={() => onLogo(null)}>
-              Remove logo
-            </button>
-          ) : null}
-        </div>
-        <p className="text-xs leading-5 text-zinc-500">
-          PNG, JPG, or WebP, up to 500 KB. A logo covers part of the code, so error correction switches to High.
-          {style.logoName ? ` Current file: ${style.logoName}.` : ""}
-        </p>
-        {logoError ? <p className="text-sm text-red-700 dark:text-red-400">{logoError}</p> : null}
+        {tab === "logo" ? (
+          <div className="space-y-2">
+            <span className={labelClass}>Center logo</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className={`${secondaryButtonClass} cursor-pointer`}>
+                <ImagePlus className="size-4" aria-hidden="true" />
+                Choose image
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+                  className="sr-only"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    onLogo(file);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+              {style.logoDataUrl ? (
+                <button type="button" className={secondaryButtonClass} onClick={() => onLogo(null)}>
+                  Remove logo
+                </button>
+              ) : null}
+            </div>
+            <p className="text-xs leading-5 text-slate-500">
+              PNG, JPG, or WebP, up to 500 KB. A logo covers part of the code, so error correction switches to High.
+              {style.logoName ? ` Current file: ${style.logoName}.` : ""}
+            </p>
+            {logoError ? <p className="text-sm text-red-700 dark:text-red-400">{logoError}</p> : null}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -454,7 +475,7 @@ function ColorField({
           aria-label={`${label} picker`}
           value={picker}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-12 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1 dark:border-zinc-700"
+          className="h-10 w-12 cursor-pointer rounded-lg border border-slate-200 bg-white p-1 dark:border-zinc-700"
         />
         <input
           id={id}

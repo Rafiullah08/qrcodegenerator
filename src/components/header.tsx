@@ -14,35 +14,32 @@ function toggleTheme() {
 }
 
 export function Header() {
-
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-[#f6f3ec]/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
       <a href="#qr-preview" className="skip-link">
         Skip to QR preview
       </a>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-        <Link href="/" className="flex min-w-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-stone-900 text-white shadow-sm dark:bg-white dark:text-stone-900">
-            <QrCode className="size-5" aria-hidden="true" />
+      <div className="mx-auto flex max-w-[90rem] items-center justify-between gap-4 px-3 py-3 sm:px-5 lg:px-6">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-indigo-600 text-white">
+            <QrCode className="size-4" aria-hidden="true" />
           </span>
           <span className="min-w-0">
-            <span className="block font-display text-2xl leading-none tracking-tight text-stone-900 dark:text-stone-50">QR Studio</span>
-            <span className="mt-1 block truncate text-xs font-medium uppercase tracking-[0.16em] text-stone-500 dark:text-zinc-400">
-              Static · Private · On this device
-            </span>
+            <span className="block text-[15px] font-semibold tracking-tight text-slate-900 dark:text-zinc-50">QR Studio</span>
+            <span className="block truncate text-xs text-slate-500 dark:text-zinc-400">Static codes, on this device</span>
           </span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Link
             href="/privacy"
-            className="rounded-full px-3 py-2 text-sm font-medium text-stone-700 hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             Privacy
           </Link>
           <button
             type="button"
             onClick={toggleTheme}
-            className="inline-flex size-10 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-sm hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="inline-flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
             aria-label="Toggle color theme"
           >
             <Sun className="hidden size-4 dark:block" />

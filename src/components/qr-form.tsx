@@ -26,10 +26,10 @@ export function QrForm({ type, forms, errors, headingRef, onChange, onBlur, onSu
       }}
     >
       <div>
-        <h2 ref={headingRef} tabIndex={-1} className="font-display text-3xl tracking-tight text-zinc-900 outline-none dark:text-zinc-50">
+        <h2 ref={headingRef} tabIndex={-1} className="text-lg font-semibold tracking-tight text-slate-900 outline-none dark:text-zinc-50">
           {meta.label}
         </h2>
-        <p className="mt-1 text-sm leading-6 text-zinc-500 dark:text-zinc-400">{meta.description}</p>
+        <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-zinc-400">{meta.description}</p>
       </div>
       <Fields type={type} forms={forms} errors={errors} onChange={onChange} onBlur={onBlur} />
       <button type="submit" className="sr-only">
@@ -328,7 +328,7 @@ function WifiFields({
           />
           <button
             type="button"
-            className="text-sm font-medium text-teal-800 hover:text-teal-950 dark:text-teal-300"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-300"
             onClick={() => setShowPassword((current) => !current)}
           >
             {showPassword ? "Hide password" : "Show password"}
@@ -338,7 +338,7 @@ function WifiFields({
       <label className="flex items-start gap-3 text-sm text-zinc-800 dark:text-zinc-100">
         <input
           type="checkbox"
-          className="mt-0.5 size-4 rounded border-zinc-300 text-teal-800 focus:ring-teal-700"
+          className="mt-0.5 size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           checked={fields.hidden}
           onChange={(event) => onChange("hidden", event.target.checked)}
         />
